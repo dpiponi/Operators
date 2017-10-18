@@ -5,6 +5,7 @@
 \usepackage[utf8x]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{epigraph}
+\usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{amstext} % for \text macro
@@ -337,6 +338,12 @@ So we're left with
 This is $n!$.
 \end{example}
 
+\begin{figure}
+\centering
+\frame{\includegraphics[width=5in]{shift2.png}}
+\caption{These techniques are old. This snippet is from Boole's Treatise on Differential Equations from 1859.}
+\end{figure}
+
 \section{Exponentials of $D$}
 Taylor's theorem tells us that
 \[
@@ -572,8 +579,11 @@ I derived it using the techniques described above but it disagreed with the pape
 It turned out that the paper had an error.
 The moral is: it's worth knowing how to derive these schemes even if they appear to be available already in publications.
 
+\subsection{Caveat}
+Before using any of these methods in any kind of differential equation solver please consider doing a von Neumann stability analysis.
+It's sometimes hard to guess which methods are and aren't stable.
 
-\subsection{Integration}
+\subsection{Numerical Integration}
 We can write
 \[
 \int_a^b f(x)dx = \Big(\frac{e^{bD}-e^{aD}}{D}f\Big)(0)
