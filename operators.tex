@@ -672,6 +672,22 @@ In other words, this is a smoothing operation.
 In fact, it is convolution with $\exp(-x^2/2a)$, sometimes known as the Weierstrass transform, but better known in the graphics and image processing world as Gaussian blur.
 I need to find a proof that doesn't use the Fourier domain.
 
+\section{Summary}
+\begin{center}
+\tabulinesep=1.2mm
+\begin{tabu}{|c|c|c|}
+\hline
+$1$ & identity & $f(x)$ \\
+$D^n$ & $n$th derivative & $f^{(b)}(x)$ \\
+$\exp(aD)$ & shift by $a$ & $f(x+a)$ \\
+$\frac{1}{D}$ & integration & $\int f(x)dx$ \\
+$\frac{1}{D+a}$ & leaky integration & \\
+$\sinh(aD)$ & finite difference & $\frac{1}{2}(f(x+a)-f(x-a))$ \\
+$\exp(aD^2/2)$ & Weierstrass transform & $\int_{-\infty}^\infty \exp(-y^2/2a) f(x+y)dy$ \\
+\hline
+\end{tabu}
+\end{center}
+
 \bibliographystyle{unsrt}
 \bibliography{operators}
 
