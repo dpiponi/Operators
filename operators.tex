@@ -7,6 +7,10 @@
 \usepackage{epigraph}
 \usepackage{amsmath}
 \usepackage{amsthm}
+\usepackage{amstext} % for \text macro
+\usepackage{array}   % for \newcolumntype macro
+\usepackage{tabu}
+\newcolumntype{R}{>{$}r<{$}} % math-mode version of ``l" column type
 
 %% Sets page size and margins
 \usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
@@ -35,10 +39,10 @@
 \begin{document}
 \maketitle
 
-\epigraph{Dedicated to Tom Mower}
+\epigraph{In memory of Tom Mower who started me on this journey more than three decades ago}
 
 \begin{abstract}
-Hello
+Some techniques for abusing the operator $D=\frac{d}{dx}$ for both symbolic and numberic integration and differential equation solving.
 \end{abstract}
 
 \section{Warm up}
@@ -422,7 +426,173 @@ The complete solution is
 \[
 a_n = \frac{5}{2}L_n+\frac{11}{2}F_n-n^2-2n-5
 \]
-
+By the way, Mathematica makes a real mess of this.
 \end{example}
+
+\section{Numerical methods}
+\subsection{Derivatives}
+The relation $(e^{hD}-1)f(x) = f(x+h)-f(x)$ expresses a finite difference in terms of the differential operator.
+We can do this in reverse and derive formulae for derivatives in terms of finite differences.
+A good application of this is to derive approximations of derivatives that we can use in numerical methods on a grid.
+Define $E_h = e^{hD}$. We'd like to write $D$ in terms of $E_h$.
+That seems straightforward. We expect
+\[
+D=\frac{1}{h}\log E_h
+\]
+
+The problem is, we can't simply apply a Taylor expansion to $\log E_h$ about $0$.
+Suppose we'd like our numerical methods to work well on polynomials - typically giving exact results on low order polynomials.
+The operator $E_h-1$ corresponds to finite differencing and we know that repeated finite differences applied to polynomials eventually give zero.
+So if we seek a power series in $E_h-1$ we can guarantee convergence on polynomials.
+Let's define the finite difference operator $\Delta_h = e^{hD}-1 = E_h-1$.
+So we should expand $\log E_h$ around $1$ and use
+\[
+D = \log(1+(E_h-1))
+\]
+
+Let's try a first order expansion.
+We get
+\[
+\log(1+(E_h-1)) = E_h-1 + \mbox{higher order terms} 
+\]
+In other words we can approximate the derivative of $f$ with
+\[
+f'(x) \approx \frac{f(x+h)-f(x)}{h}
+\]
+As we might expect, this is exact if $f$ is a linear function.
+What if we try second order.
+\begin{eqnarray*}
+\log(1+(E_h-1)) & \approx  & E_h-1 - \frac{1}{2}(E_h-1)^2 \\
+& = & -\frac{1}{2}E_h^2+2E_h-\frac{3}{2}
+\end{eqnarray*}
+So we get
+\[
+f'(x) \approx \frac{-f(x+2h)+4f(x+h)-3f(x)}{2h}
+\]
+This is known as a second-order upwind scheme.
+It's ``upwind'' because it's using values of $f$ on one side of $x$ to estimate the derivative.
+This is good in numerical methods where you only want to look at one side - for example in simulations of convection where we're trying to estimate what happens in the future and so shouldn't be using information corresponding to fluid that has already come and gone.
+But often we want a balanced estimate of the derivative.
+But a power series in $e^{hD}$ can't ever refer to points left of $x$.
+On the other hand we could try to estimate $f'(x+h)$.
+In other words, we should compute $E_hD=e^{hD}D$ in terms of $E_h$.
+Clearly
+\[
+E_hD = E_h\log E_h
+\]
+Expanding around $1$ we get
+\begin{eqnarray*}
+E_hD & = & (1+\Delta_h)\log(1+\Delta_h) \\
+& \approx & (1+\Delta_h)(\Delta_h-\frac{1}{2}\Delta_h^2) \\
+& \approx & \Delta_h+\frac{1}{2}\Delta_h^2 \\
+& = & E_h-1+\frac{1}{2}(E_h-1)^2 \\
+& = & -\frac{1}{2}+\frac{1}{2}E_h^2\\
+\end{eqnarray*}
+So $f'(x+h) \approx \frac{1}{h}(f(x+2h)-x(f))$ or
+\[
+f'(x) \approx \frac{f(x+h)-f(x-h)}{2h}.
+\]
+which is the usual central difference formula.
+
+More generally, we can use the power series of $\Delta_h^m\log\Delta_h$ up to terms in $\Delta_h^k$ to generate an $k$th order estimate for $D$.
+Even more generally, we can use the power series of $\Delta_h^m(\log\Delta_h)^n$ to estimate $D^n$.
+
+\begin{example}
+Derive a 3rd order upwind estimate for $D$ using $f(x-h),\ldots,f(x+3h)$.
+Solution:
+\begin{eqnarray*}
+(1+\Delta_h)\log(1+\Delta_h) & \approx & (1+\Delta_h)(\Delta_h-\frac{1}{2}\Delta_h^2+\frac{1}{3}\Delta_h^3) \\
+& = & \Delta_h-\frac{1}{2}\Delta_h^2+\frac{1}{3}\Delta_h^3+\Delta_h^2-\frac{1}{2}\Delta_h^3 \\
+& = & \Delta_h+\frac{1}{2}\Delta_h^2-\frac{1}{6}\Delta_h^3 \\
+& = & E_h-1+\frac{1}{2}(E_h-1)^2-\frac{1}{6}(E_h-1)^3 \\
+& = & E_h-1+\frac{1}{2}(E_h^2-2E_h+1)-\frac{1}{6}(E_h^3-3E_h^2+3E_h-1) \\
+& = & -\frac{1}{3}-\frac{1}{2}E_h+E_h^2-\frac{1}{6}E_h^3 \\
+\end{eqnarray*}
+So 
+\[
+f'(x) = \frac{-2f(x-h)-3f(x)+6f(x+h)-f(x+2h)}{6}
+\]
+\end{example}
+
+\begin{example}
+Derive a symmetric 4th order order estimate for the third drivative.
+Solution:
+\begin{eqnarray*}
+(1+\Delta_h)^2(\log(1+\Delta_h))^3 & \approx &
+(1+\Delta_h)^2(\Delta_h-\frac{1}{2}\Delta_h^2+\frac{1}{3}\Delta_h^3-\frac{1}{4}\Delta_h^4)^2 \\
+& \approx & \Delta_h^3+\frac{1}{2}\Delta_h^4 \\
+& = & \frac{1}{2}(-1+2\Delta_h^2-2\Delta_h^2+\Delta_h^3) \\
+\end{eqnarray*}
+So
+\[
+f^{(3)}(x) \approx \frac{-f(x-2h)+2f(x-h)-2f(x+h)+f(x+2h)}{2}
+\]
+\end{example}
+
+\subsection{A generating function for all one-sided derivative schemes}
+Suppose we have a power series $f(x) = a_0+a_1x+a_2x^2+\ldots$.
+We can form a generating function for the $n$th partial sum $a_0+a_1x+\ldots+a_{n-1}x^{n-1}$ as
+\[
+a_0+k(a_0+a_1x)+k^2(a_0+a_1x+a_2x^2)+\ldots
+\]
+Assuming absolute convergence can rearrange this as
+\begin{eqnarray*}
+& & (1+k+k^2+\ldots)a_0
++k(1+k+k^2+\ldots)a_1x
++k^2(1+k+k^2+\ldots)a_2x^2+\ldots \\
+& = & \frac{1}{1-k}(a_0+a_1(kx)+a_2(kx)^2+\ldots) \\
+& = & f(kx)/(1-k)
+\end{eqnarray*}
+The $n$th order one-sided derivative is derived using $n$ terms from $\log E_h = \log(1+\Delta_h)$.
+So the coefficients from the $n$th order scheme are the coefficients of the polynomial in $x$ that forms the coefficient of $k^n$ in $\frac{\log(1+(x-1)k)}{1-k}$.
+We can tabulate this as
+\begin{center}
+\tabulinesep=1.2mm
+\begin{tabu}{|c| R  R  R  R  R  R  R  R|}
+\hline
+\text{Order} & \multicolumn{8}{| l |}{Coefficients} \\
+\hline
+0 & 0 & & & & & & & \\
+1 & -1 & 1 & & & & & & \\
+2 & \frac{-3}{2} & 2 & \frac{-1}{2} & & & & & \\
+3 & \frac{-11}{6} & 3 & \frac{-3}{2} & \frac{1}{3} & & & & \\
+4 & \frac{-25}{12} & 4 & -3 & \frac{4}{3} & \frac{-1}{4} & & & \\
+5 & \frac{-137}{60} & 5 & -5 & \frac{10}{3} & \frac{-5}{4} & \frac{1}{5} & & \\
+\hline
+\end{tabu}
+\end{center}
+This reproduces the table in \cite{Fornberg1988}.
+All of the results in that paper can be reproduced by forming power series from expressions of the form $(1+x)^m(\log(1+x))^n$, with $m$ a half-integer in some cases.
+
+Incidentally, I used the second order scheme from this table in ILM's GPU based fluid simulator basing my work on \cite{SCA:SCA08:009-018}.
+I derived it using the techniques described above but it disagreed with the paper.
+It turned out that the paper had an error.
+The moral is: it's worth knowing how to derive these schemes even if they appear to be available already in publications.
+
+
+\subsection{Integration}
+We can write
+\[
+\int_a^b f(x)dx = \Big(\frac{e^{bD}-e^{aD}}{D}f\Big)(0)
+\]
+There are two ways to see this.
+One is to view $\frac{1}{D}f$ as the indefinite integral with $e^{bD}$ and $e^{aD}$ picking out the value of this indefinite integral at $x=b$ and $x=a$.
+Another is the following derivation:
+\begin{eqnarray*}
+\int_a^b f(x)dx & = & \Big(\int_a^b\exp(yD)f\Big)(0) dy \\
+& = & \Big(\int_a^b\exp(yD)dy f\Big)(0) \\
+& = & \Big(\frac{e^{bD}-e^{aD}}{D}f\Big)(0) \\
+\end{eqnarray*}
+if you can make yourself to believe that $D$ can behave like an ordinary number in an integration.
+This means we can expect to derive useful integration schemes using
+
+\subsection{Simpson's rule}
+
+\subsection{Newton-Coates rules}
+
+\subsection{Bessel functions and integrating oover disks}
+
+\bibliographystyle{unsrt}
+\bibliography{operators}
 
 \end{document}
