@@ -578,6 +578,7 @@ Incidentally, I used the second order scheme from this table in ILM's GPU based 
 I derived it using the techniques described above but it disagreed with the paper.
 It turned out that the paper had an error.
 The moral is: it's worth knowing how to derive these schemes even if they appear to be available already in publications.
+(That paper is otherwise excellent and contains many powerful methods.)
 
 \subsection{Caveat}
 Before using any of these methods in any kind of differential equation solver please consider doing a von Neumann stability analysis.
@@ -597,13 +598,79 @@ Another is the following derivation:
 & = & \Big(\frac{e^{bD}-e^{aD}}{D}f\Big)(0) \\
 \end{eqnarray*}
 if you can make yourself to believe that $D$ can behave like an ordinary number in an integration.
-This means we can expect to derive useful integration schemes using
+Again we use the technique of writing $D=\frac{1}{h}\log E_h$.
 
 \subsection{Simpson's rule}
+Let $E=E_1$, $\Delta=\Delta_1$.
+We start with
+\[
+\int_0^2f(x)dx = \frac{E^{2D}-1}{D} = \frac{E^2-1}{\log E}
+\]
+We'll expand up to terms in $\Delta^2$:
 
-\subsection{Newton-Coates rules}
+\begin{eqnarray*}
+\frac{E^2-1}{\log E}
+& = & \frac{(\Delta+1)^2-1}{\Delta-\frac{1}{2}\Delta^2+\frac{1}{3}\Delta^3} \\
+& = & \frac{\Delta^2+2\Delta}{\Delta-\frac{1}{2}\Delta^2+\frac{1}{3}\Delta^3} \\
+& = & \frac{\Delta+2}{1-\frac{1}{2}\Delta+\frac{1}{3}\Delta^2} \\
+& = & (\Delta+2)(1+\frac{1}{2}\Delta-\frac{1}{3}\Delta^2+(\frac{1}{2}\Delta)^2) \\
+& = & (\Delta+2)(1+\frac{1}{2}\Delta-\frac{1}{12}\Delta^2) \\
+& = & \Delta+\frac{1}{2}\Delta^2+2+\Delta-\frac{1}{6}\Delta^2 \\
+& = & 2+2\Delta+\frac{1}{3}\Delta^2 \\
+\end{eqnarray*}
+Now substitute $\Delta=E-1$ to get
+\begin{eqnarray*}
+2+2(E-1)+\frac{1}{3}(E^2-2E+1) & = &2+2E-2+\frac{1}{3}E^2-\frac{2}{3}E+\frac{1}{3} \\
+& = & \frac{1}{3}+\frac{4}{3}E+\frac{1}{3}E^2 \\
+\end{eqnarray*}
+So
+\[
+\int_0^2f(x)dx \approx \frac{1}{3}(f(0)+4f(1)+f(2))
+\]
+Rescaling the $x$-axis gives:
+\[
+\int_a^bf(x)dx \approx \frac{b-a}{6}(f(x_0)+4f(x_1)+f(x_2))
+\]
+where $x_0=a$, $x_1=\frac{a+b}{2}$, $x_2=b$.
+This is the usual Simpson rule.
+Note that we could have kept terms up to $\Delta^3$ in the derivation above and we would have had the same result.
+So Simpson's rule is good for cubics as well as quadratics.
 
-\subsection{Bessel functions and integrating oover disks}
+\subsection{Newton-Cotes rules}
+The higher order integration rules known as the Newton-Cotes rules can be derived from Taylor expansions of
+\[
+\frac{(1+\Delta)^n-1}{n\log(1+\Delta)}
+\]
+taken to terms in $\Delta^n$ and then substituting $\Delta=E-1$.
+For example expanding the $n=4$ case gives
+\[
+\frac{1}{90}(7+32E+12E^2+32E^3+7E^4)
+\]
+These are the coefficients from Boole's integration rule
+\[
+\int_a^bf(x)dx \approx \frac{b-a}{90}(7f(x_0)+32f(x_1)+12f(x_2)+32f(x_3)+7f(x_4))
+\]
+with the $x_i$ equally spaced from $a$ to $b$.
+
+\subsection{Bessel functions and integrating over disks}
+
+\subsection{Quadratic exponentials $\exp{aD^2/2}$}
+Consider
+\[
+e^{aD^2/2}f
+\]
+To get some intution, pick a large $N$ and write this as
+\[
+(e^{aD^2/2N})^Nf
+\]
+So this is multiple applications of $\exp(aD^2/2N) \approx 1+\frac{aD^2}{2N}$.
+The operator $D^2$ measures convexity.
+In areas of convexity, $D^2f$ is positive and so applying $1+\frac{aD^2}{2N}$ will ``push up'' the convexity, smoothing things out.
+Conversely, concave areas get pushed down.
+So we have a sequence of $N$ steps, each of which reduces concavity or convexity.
+In other words, this is a smoothing operation.
+In fact, it is convolution with $\exp(-x^2/2a)$, sometimes known as the Weierstrass transform, but better known in the graphics and image processing world as Gaussian blur.
+I need to find a proof that doesn't use the Fourier domain.
 
 \bibliographystyle{unsrt}
 \bibliography{operators}
