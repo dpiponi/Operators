@@ -47,6 +47,7 @@ Some techniques for abusing the operator $D=\frac{d}{dx}$ for both symbolic and 
 Note: work in progress.
 There are errors, some of which I know about.
 Notation is also inconsistent.
+Check back frequently.
 \end{abstract}
 
 \section{Warm up}
@@ -341,7 +342,7 @@ This is $n!$.
 \begin{figure}
 \centering
 \frame{\includegraphics[width=5in]{shift2.png}}
-\caption{These techniques are old. This snippet is from Boole's Treatise on Differential Equations from 1859.}
+\caption{These techniques are old. This snippet is from Boole's \emph{A Treatise on Differential Equations} from 1859.}
 \end{figure}
 
 \section{Exponentials of $D$}
@@ -365,7 +366,7 @@ f(x+a) = \exp(aD)(f)(x)
 \]
 In other words, $\exp(aD)$ is the operator that shifts a function by $a$.
 
-\section{Sums}
+\section{Sums and recurrence relations}
 Armed with exponentials of $D$ we can extend our methods for integrals and differential equations to sums and recurrence relations.
 \begin{example}
 Find
@@ -437,6 +438,8 @@ The complete solution is
 a_n = \frac{5}{2}L_n+\frac{11}{2}F_n-n^2-2n-5
 \]
 By the way, Mathematica makes a real mess of this.
+I've seen similar methods in a work at least a century old.
+Maybe Boole.
 \end{example}
 
 \section{Numerical methods}
@@ -459,6 +462,12 @@ So we should expand $\log E_h$ around $1$ and use
 \[
 D = \log(1+(E_h-1))
 \]
+
+\begin{figure}
+\centering
+\frame{\includegraphics[width=5in]{argobast.png}}
+\caption{A snippet from Arbogast's \emph{Du calcul des d\'{e}rivations} published in 1800}
+\end{figure}
 
 Let's try a first order expansion.
 We get
@@ -651,6 +660,13 @@ These are the coefficients from Boole's integration rule
 \int_a^bf(x)dx \approx \frac{b-a}{90}(7f(x_0)+32f(x_1)+12f(x_2)+32f(x_3)+7f(x_4))
 \]
 with the $x_i$ equally spaced from $a$ to $b$.
+This is probably the method used by Boole to derive these coefficients.
+
+\begin{figure}
+\centering
+\frame{\includegraphics[width=5in]{log.png}}
+\caption{A snippet from Boole's \emph{Calculus of Finite Differences}}
+\end{figure}
 
 \subsection{Bessel functions and integrating over disks}
 
@@ -672,6 +688,34 @@ In other words, this is a smoothing operation.
 In fact, it is convolution with $\exp(-x^2/2a)$, sometimes known as the Weierstrass transform, but better known in the graphics and image processing world as Gaussian blur.
 I need to find a proof that doesn't use the Fourier domain.
 
+\subsection{Dirac deltas of $D$ and the Fourier transform}
+We now throw all caution to the wind.
+A standard representation of the Dirac delta function is
+\[
+2\pi\delta(x) = \int_{-\infty}^\infty \exp(i\omega x)d\omega
+\]
+So we have
+\begin{eqnarray*}
+(2\pi\delta(iD-\omega)f)(x) & = & \big(\int_{-\infty}^\infty\exp(iy(iD-\omega))dyf\big)(x) \\
+& = & \big(\int_{-\infty}^\infty\exp(iy(iD-\omega))dyf\big)(x) \\
+& = & \int_{-\infty}^\infty\exp(-iy\omega\big)f(x-y)dy \\
+& = & \int_{-\infty}^\infty\exp(i(x-y)\omega)f(y)dy \\
+& = & \exp(ix\omega)\int_{-\infty}^\infty\exp(-iy\omega)f(y)dy \\
+& = & \sqrt{2\pi}\exp(ix\omega)\tilde{F}(\omega)
+\end{eqnarray*}
+where I'm using the definition
+\[
+\tilde{F}(\omega) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^\infty\exp(-ix\omega)f(x)dx \\
+\]
+(Two mistakes I often make: dropping $2\pi$ and minus signs.
+I may have made both here.
+Must check.)
+
+(Also, I think that if $P$ is some quantum mechanical observable, then $\delta(P-p)$ projects a state onto the space of eigenvectors corresponding to eigenvalue $p$ for $P$.)
+
+\subsection{The Wigner transformation}
+Maybe I'll get onto this\dots
+
 \section{Summary}
 \begin{center}
 \tabulinesep=1.2mm
@@ -685,9 +729,23 @@ $\frac{1}{D+a}$ & leaky integration & \\
 $\sinh(aD)$ & finite difference & $\frac{1}{2}(f(x+a)-f(x-a))$ \\
 $\exp(aD^2/2)$ & Weierstrass transform & $\int_{-\infty}^\infty \exp(-y^2/2a) f(x+y)dy$ \\
 $\frac{1}{\exp D-1}$ & Euler-Maclaurin sum & $\sum_x f(x)$ \\
+$\delta(iD-\omega)$ & Fourier transform & $\frac{1}{\sqrt{2\pi}}\exp(ix\omega)\tilde{F}(\omega)$ \\
 \hline
 \end{tabu}
 \end{center}
+
+\section{Conclusion}
+There are a couple of other uniform approaches to much of what I've said above.
+
+One is to use the shift rule to turn your problem into some kind of constraint on a polynomial.
+Write the polynomial in general form as $a_0+a_1x+\ldots+a_nx^n$ and write the constraint as a linear system in the vector $(a_0,\ldots,a_n)$.
+This is the traditional method taught to students when solving differential equations.
+Guess something general enough and solve for the coefficients.
+
+Another approach, relevant to the numerical methods, is to again assume your problem is about polynomials, and use Lagrange interpolation to fit a polynomial to your data.
+You now integrate or differentiate the interpolating polynomial and relate this back as a linear operation on your original data.
+
+Both of these miss out on the hidden structure given by rational and transcendental functions of $D$.
 
 \bibliographystyle{unsrt}
 \bibliography{operators}
