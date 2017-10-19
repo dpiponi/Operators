@@ -670,7 +670,7 @@ This is probably the method used by Boole to derive these coefficients.
 
 \subsection{Bessel functions and integrating over disks}
 
-\subsection{Quadratic exponentials $\exp{aD^2/2}$}
+\section{Quadratic exponentials $\exp{aD^2/2}$}
 Consider
 \[
 e^{aD^2/2}f
@@ -688,7 +688,7 @@ In other words, this is a smoothing operation.
 In fact, it is convolution with $\exp(-x^2/2a)$, sometimes known as the Weierstrass transform, but better known in the graphics and image processing world as Gaussian blur.
 I need to find a proof that doesn't use the Fourier domain.
 
-\subsection{Dirac deltas of $D$ and the Fourier transform}
+\section{Dirac deltas of $D$ and the Fourier transform}
 We now throw all caution to the wind.
 A standard representation of the Dirac delta function is
 \[
@@ -707,13 +707,17 @@ where I'm using the definition
 \[
 \tilde{F}(\omega) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^\infty\exp(-ix\omega)f(x)dx \\
 \]
+Notice what it's doing.
+It's projecting the original $f$ to a plane wave scaled by the Fourier transform at $\omega$.
+It's the projection of $f$ onto the Fourier component corresponding to $\omega$.
+
 (Two mistakes I often make: dropping $2\pi$ and minus signs.
 I may have made both here.
 Must check.)
 
 (Also, I think that if $P$ is some quantum mechanical observable, then $\delta(P-p)$ projects a state onto the space of eigenvectors corresponding to eigenvalue $p$ for $P$.)
 
-\subsection{The Wigner transformation}
+\section{The Wigner transformation, the Heisenberg group 'n' all that}
 Maybe I'll get onto this\dots
 
 \section{Summary}
@@ -722,7 +726,7 @@ Maybe I'll get onto this\dots
 \begin{tabu}{|c|c|c|}
 \hline
 $1$ & identity & $f(x)$ \\
-$D^n$ & $n$th derivative & $f^{(b)}(x)$ \\
+$D^n$ & $n$th derivative & $f^{(n)}(x)$ \\
 $\exp(aD)$ & shift by $a$ & $f(x+a)$ \\
 $\frac{1}{D}$ & integration & $\int f(x)dx$ \\
 $\frac{1}{D+a}$ & leaky integration & \\
