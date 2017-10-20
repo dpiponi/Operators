@@ -30,6 +30,8 @@
 \usetikzlibrary{decorations.pathmorphing,patterns}
 \usetikzlibrary{external}
 \tikzexternalize
+\tikzset{mystyle/.style={shape=circle,fill=black,scale=0.3}}
+\tikzset{withtext/.style={fill=white}}
 
 \theoremstyle{definition}
 \newtheorem{example}{Example}[section]
@@ -48,6 +50,8 @@ Note: work in progress.
 There are errors, some of which I know about.
 Notation is also inconsistent.
 Check back frequently.
+Starts with stuff I originally learnt at high school.
+Eventually gets a bit more advanced.
 \end{abstract}
 
 \section{Warm up}
@@ -669,6 +673,65 @@ This is probably the method used by Boole to derive these coefficients.
 \end{figure}
 
 \subsection{Bessel functions and integrating over disks}
+This is more of a curiosity than a practical application.
+
+TODO
+
+\begin{figure}
+    \begin{minipage}{.5\textwidth}
+        \begin{tikzpicture}[scale=.5]
+            % setup the nodes
+            \foreach \x in {0,...,8}
+            \foreach \y in {0,...,8}
+            {
+            \ifnum\x=4
+                \ifnum\y=4
+                    \node (\x-\y) at (\x,\y){X};
+                \else
+                    \node[mystyle] (\x-\y) at (\x,\y){};
+                \fi
+            \else
+                \node[mystyle] (\x-\y) at (\x,\y){};
+            \fi
+            }
+            % circle selected nodes with letters
+            \foreach \mynode/\mytext in {4-3/A,3-4/B,5-4/C,4-5/D}
+            {
+                \draw[withtext] (\mynode) circle (0.4cm) node {\mytext};
+            }
+        \end{tikzpicture}
+    \end{minipage}%
+    \begin{minipage}{.5\textwidth}
+        \begin{tikzpicture}[scale=.5]
+            % setup the nodes
+            \foreach \x in {0,...,8}
+            {
+            \ifnum\x=4
+                \node (\x) at (\x,0){X};
+            \else
+                \node[mystyle] (\x) at (\x,0){};
+            \fi
+            }
+            % circle selected nodes
+            \foreach \mynode in {3,5}
+            {
+                \draw (\mynode) circle (0.3cm);
+            }
+        \end{tikzpicture}
+    \end{minipage}%
+\end{figure}
+\[
+\frac{2(1+\Delta_x)^2(1+\Delta_y)^2I_1(\sqrt{\log(1+\Delta_x)^2+\log(1+\Delta_y)^2})}{\sqrt{\log(1+\Delta_x)^2+\log(1+\Delta_y)^2}}
+\]
+
+\tabulinesep=1.2mm
+\begin{tabu}{ccccc}
+$\frac{29}{1105920}$ & $\frac{-179}{276480}$ & $\frac{-731}{184320}$ & $\frac{-179}{276480}$ & $\frac{29}{1105920}$ \\
+$\frac{-179}{276480}$ & $\frac{1049}{69120}$ & $\frac{5381}{46080}$ & $\frac{1049}{69120}$ & $\frac{-179}{276480}$ \\
+$\frac{-731}{184320}$ & $\frac{5381}{46080}$ & $\frac{15149}{30720}$ & $\frac{5381}{46080}$ & $\frac{-731}{184320}$ \\
+$\frac{-179}{276480}$ & $\frac{1049}{69120}$ & $\frac{5381}{46080}$ & $\frac{1049}{69120}$ & $\frac{-179}{276480}$ \\
+$\frac{29}{1105920}$ & $\frac{-179}{276480}$ & $\frac{-731}{184320}$ & $\frac{-179}{276480}$ & $\frac{29}{1105920}$ \\
+\end{tabu}
 
 \section{Quadratic exponentials $\exp{aD^2/2}$}
 Consider
@@ -696,9 +759,9 @@ A standard representation of the Dirac delta function is
 \]
 So we have
 \begin{eqnarray*}
-(2\pi\delta(iD-\omega)f)(x) & = & \big(\int_{-\infty}^\infty\exp(iy(iD-\omega))dyf\big)(x) \\
-& = & \big(\int_{-\infty}^\infty\exp(iy(iD-\omega))dyf\big)(x) \\
-& = & \int_{-\infty}^\infty\exp(-iy\omega\big)f(x-y)dy \\
+(2\pi\delta(iD-\omega)f)(x) & = & \Big(\int_{-\infty}^\infty\exp(iy(iD-\omega))dyf\Big)(x) \\
+& = & \Big(\int_{-\infty}^\infty\exp(iy(iD-\omega))dyf\Big)(x) \\
+& = & \int_{-\infty}^\infty\exp(-iy\omega)f(x-y)dy \\
 & = & \int_{-\infty}^\infty\exp(i(x-y)\omega)f(y)dy \\
 & = & \exp(ix\omega)\int_{-\infty}^\infty\exp(-iy\omega)f(y)dy \\
 & = & \sqrt{2\pi}\exp(ix\omega)\tilde{F}(\omega)
@@ -707,18 +770,40 @@ where I'm using the definition
 \[
 \tilde{F}(\omega) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^\infty\exp(-ix\omega)f(x)dx \\
 \]
+Therefore
+\[
+(\delta(iD-\omega)f)(x) = \frac{1}{\sqrt{2\pi}}\exp(ix\omega)\tilde{F}(\omega)
+\]
 Notice what it's doing.
 It's projecting the original $f$ to a plane wave scaled by the Fourier transform at $\omega$.
 It's the projection of $f$ onto the Fourier component corresponding to $\omega$.
+We expect to be able to reassemble the original function $f$ by summing these projections back up again.
+First on the right hand side:
+\begin{eqnarray*}
+\int_{-\infty}^\infty\frac{1}{\sqrt{2\pi}}\exp(ix\omega)\tilde{F}(w)d\omega & = & f(x) \\
+\end{eqnarray*}
+This is the usual statement of how to invert the Fourier transform.
+Now on the left hand side:
+\begin{eqnarray*}
+\Big(\int_{-\infty}^\infty\delta(iD-\omega)d\omega f\Big)(x) & = &
+\frac{1}{\sqrt{2\pi}}\int_{-\infty}^\infty\delta(iD-\omega)\int_{-\infty}^\infty\tilde{F}(\nu)\exp(i\nu x)d\nu d\omega \\
+& = & \frac{1}{\sqrt{2\pi}}\int_{-\infty}^\infty\int_{-\infty}^\infty\tilde{F}(\nu)\delta(iD-\omega)\exp(i\nu x)d\omega d\nu \\
+& = & \frac{1}{\sqrt{2\pi}}\int_{-\infty}^\infty\int_{-\infty}^\infty\tilde{F}(\nu)\delta(i(i\nu)-\omega)\exp(i\nu x)d\omega d\nu \mbox{ (diagonalisation)}\\
+& = & \frac{1}{\sqrt{2\pi}}\int_{-\infty}^\infty\int_{-\infty}^\infty\tilde{F}(\nu)\delta(-\nu-\omega)\exp(i\nu x)d\omega d\nu \\
+& = & \frac{1}{\sqrt{2\pi}}\int_{-\infty}^\infty\tilde{F}(-\omega)\exp(-i\omega x)d\omega \mbox{ (standard property of $\delta$)} \\
+& = & \frac{1}{\sqrt{2\pi}}\int_{-\infty}^\infty\tilde{F}(\omega)\exp(i\omega x)d\omega \\
+& = & f(x) \\
+\end{eqnarray*}
+This illustrates how we're able to work with a Dirac delta of a differential operator much like how you can work with a conventional Dirac delta.
 
-(Two mistakes I often make: dropping $2\pi$ and minus signs.
-I may have made both here.
-Must check.)
+%(Two mistakes I often make: dropping $2\pi$ and minus signs.
+%I may have made both here.
+%Must check.)
 
-(Also, I think that if $P$ is some quantum mechanical observable, then $\delta(P-p)$ projects a state onto the space of eigenvectors corresponding to eigenvalue $p$ for $P$.)
-
-\section{The Wigner transformation, the Heisenberg group 'n' all that}
-Maybe I'll get onto this\dots
+%(Also, I think that if $P$ is some quantum mechanical observable, then $\delta(P-p)$ projects a state onto the space of eigenvectors corresponding to eigenvalue $p$ for $P$.)
+%
+%\section{The Wigner transformation, the Heisenberg group 'n' all that}
+%Maybe I'll get onto this\dots
 
 \section{Summary}
 \begin{center}
@@ -738,7 +823,13 @@ $\delta(iD-\omega)$ & Fourier transform & $\frac{1}{\sqrt{2\pi}}\exp(ix\omega)\t
 \end{tabu}
 \end{center}
 
-\section{Conclusion}
+\section{More}
+So far I've looked at functions of $D$ but it's also possible look at functions of both $x$ and $D$.
+For example $\exp(xD)$ is an operator that appears in many places.
+However, I have to draw the line somewhere.
+So in these notes I've chosen to stick with functions of just $D$ and leave the larger class of operators to a sequel.
+
+\section{Final thoughts}
 There are a couple of other uniform approaches to much of what I've said above.
 
 One is to use the shift rule to turn your problem into some kind of constraint on a polynomial.
