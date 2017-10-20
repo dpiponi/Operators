@@ -5,6 +5,7 @@
 \usepackage[utf8x]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{epigraph}
+\usepackage{float}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amsthm}
@@ -672,66 +673,92 @@ This is probably the method used by Boole to derive these coefficients.
 \caption{A snippet from Boole's \emph{Calculus of Finite Differences}}
 \end{figure}
 
-\subsection{Bessel functions and integrating over disks}
-This is more of a curiosity than a practical application.
-
-TODO
-
-\begin{figure}
-    \begin{minipage}{.5\textwidth}
-        \begin{tikzpicture}[scale=.5]
-            % setup the nodes
-            \foreach \x in {0,...,8}
-            \foreach \y in {0,...,8}
-            {
-            \ifnum\x=4
-                \ifnum\y=4
-                    \node (\x-\y) at (\x,\y){X};
-                \else
-                    \node[mystyle] (\x-\y) at (\x,\y){};
-                \fi
-            \else
-                \node[mystyle] (\x-\y) at (\x,\y){};
-            \fi
-            }
-            % circle selected nodes with letters
-            \foreach \mynode/\mytext in {4-3/A,3-4/B,5-4/C,4-5/D}
-            {
-                \draw[withtext] (\mynode) circle (0.4cm) node {\mytext};
-            }
-        \end{tikzpicture}
-    \end{minipage}%
-    \begin{minipage}{.5\textwidth}
-        \begin{tikzpicture}[scale=.5]
-            % setup the nodes
-            \foreach \x in {0,...,8}
-            {
-            \ifnum\x=4
-                \node (\x) at (\x,0){X};
-            \else
-                \node[mystyle] (\x) at (\x,0){};
-            \fi
-            }
-            % circle selected nodes
-            \foreach \mynode in {3,5}
-            {
-                \draw (\mynode) circle (0.3cm);
-            }
-        \end{tikzpicture}
-    \end{minipage}%
-\end{figure}
+\subsection{Numerical integration over arbitrary regions}
+Suppose we wish to find a numerical method for the integral
 \[
-\frac{2(1+\Delta_x)^2(1+\Delta_y)^2I_1(\sqrt{\log(1+\Delta_x)^2+\log(1+\Delta_y)^2})}{\sqrt{\log(1+\Delta_x)^2+\log(1+\Delta_y)^2}}
+I(f) = \int_D f(x,y)dxdy
+\]
+where the integral is over some domain $D$ in two dimensions, say.
+We'd like to compute this in terms of samples of $f$ at points on some grid.
+How can we derive a suitable method?
+As we're working in two dimensions, let's define $X=\frac{\partial}{\partial x}$ and $Y=\frac{\partial}{\partial y}$.
+Write
+\begin{eqnarray*}
+I(f) & = & \int_D f(x,y)dxdy \\
+     & = & \int_D f(x',y')dx'dy' \\
+     & = & \Big(\int_D e^{x'X}e^{y'Y}dx'dy' f\Big)(0) \\
+\end{eqnarray*}
+So we need to expand the operator
+\[
+\int_D e^{x'X}e^{y'Y}dx'dy' \\
+\]
+in terms of $\Delta_x = E_x-1$ and $\Delta_y = E_y-1$ with $E_x=e^X$ and $E_y=e^Y$.
+(Note change of notation from $\Delta_h$ I used earlier.)
+
+As a practical example considering integrating a function over the unit disk using a grid of 25 points.
+It's convenient to start with the disk of radius 2 with the $5\times 5$ grid from $(-2,-2)$ to $(2,2)$ illustrated below:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1]
+
+    \draw[fill=gray!50] (2,2) circle (2cm);
+
+    \foreach \x in {0,...,4}
+    \foreach \y in {0,...,4}
+    {
+        \node[mystyle] (\x-\y) at (\x,\y){};
+    }
+
+\end{tikzpicture}
+\end{figure}
+
+First we compute the intgral
+\begin{eqnarray*}
+U(a,b) & = & \frac{1}{\pi}\int_D \exp(ax+by)dxdy \\
+       & = & \frac{1}{\pi}\int_0^{2\pi}\int_0^2 \exp(a\cos\theta+b\cos\theta)rdrd\theta \\
+\end{eqnarray*}
+This is in fact a slight variation on the classic integration that gives us the Airy disk in optics.
+The result is
+\[
+U(a,b) = \frac{4I_1(2\sqrt{a^2+b^2})}{\sqrt{a^2+b^2}}
+\]
+where $I_1$ is the first order modified Bessel function of the first kind.
+
+Scaling by $\frac{1}{4}$ so as to get coefficients appropriate for the unit circle, we compute the Taylor series up to 4th order in $\Delta_x$ and $\Delta_y$ in
+\[
+\frac{1}{4}(1+\Delta_x)^2(1+\Delta_y)^2U(\log(1+\Delta_x),\log(1+\Delta_y))
 \]
 
+When this expansion is written in terms of $E_x$ and $E_y$ we get the grid of coefficients:
+
 \tabulinesep=1.2mm
-\begin{tabu}{ccccc}
-$\frac{29}{1105920}$ & $\frac{-179}{276480}$ & $\frac{-731}{184320}$ & $\frac{-179}{276480}$ & $\frac{29}{1105920}$ \\
-$\frac{-179}{276480}$ & $\frac{1049}{69120}$ & $\frac{5381}{46080}$ & $\frac{1049}{69120}$ & $\frac{-179}{276480}$ \\
-$\frac{-731}{184320}$ & $\frac{5381}{46080}$ & $\frac{15149}{30720}$ & $\frac{5381}{46080}$ & $\frac{-731}{184320}$ \\
-$\frac{-179}{276480}$ & $\frac{1049}{69120}$ & $\frac{5381}{46080}$ & $\frac{1049}{69120}$ & $\frac{-179}{276480}$ \\
-$\frac{29}{1105920}$ & $\frac{-179}{276480}$ & $\frac{-731}{184320}$ & $\frac{-179}{276480}$ & $\frac{29}{1105920}$ \\
+\begin{center}
+$\frac{1}{4320}$
+\begin{tabu}{|c|c|c|c|c|}
+\hline
+-1 & 34 & 114 & 34 & -1 \\
+\hline
+34 & 464 & 444 & 464 & 34 \\
+\hline
+114 & 444 & -36 & 444 & 114 \\
+\hline
+34 & 464 & 444 & 464 & 34 \\
+\hline
+-1 & 34 & 114 & 34 & -1 \\
+\hline
 \end{tabu}
+\end{center}
+
+We can try using these coeffients to integrate an example function.
+\[
+\int_D \cos(2x)\log(2+y^2) dx dy \approx 0.477976.
+\]
+Using the coefficients above we get $0.477383$.
+
+Note that this example is sub-optimal.
+For example, it uses values outside of the integration region.
+But for smooth enough functions it gives good results and the method can be adapted to many other problems.
 
 \section{Quadratic exponentials $\exp{aD^2/2}$}
 Consider
