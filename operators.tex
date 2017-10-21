@@ -760,7 +760,7 @@ Note that this example is sub-optimal.
 For example, it uses values outside of the integration region.
 But for smooth enough functions it gives good results and the method can be adapted to many other problems.
 
-\section{Quadratic exponentials $\exp{aD^2/2}$}
+\section{Quadratic exponentials $\exp(aD^2/2)$}
 Consider
 \[
 e^{aD^2/2}f
@@ -775,8 +775,22 @@ In areas of convexity, $D^2f$ is positive and so applying $1+\frac{aD^2}{2N}$ wi
 Conversely, concave areas get pushed down.
 So we have a sequence of $N$ steps, each of which reduces concavity or convexity.
 In other words, this is a smoothing operation.
-In fact, it is convolution with $\exp(-x^2/2a)$, sometimes known as the Weierstrass transform, but better known in the graphics and image processing world as Gaussian blur.
-I need to find a proof that doesn't use the Fourier domain.
+
+Here is an informal argument.
+We start by convolving $f$ with $\exp(-\frac{y^2}{2a})$:
+\begin{eqnarray*}
+\int_{-\infty}^\infty\exp(-\frac{y^2}{2a}) f(x-y) dy
+& = & \int_{-\infty}^\infty\exp(-\frac{y^2}{2a})\exp(-yD) dy f(x) \\
+& = & \int_{-\infty}^\infty\exp(\frac{-(y+aD)^2}{2a})\exp(\frac{aD^2}{2}) dy f(x) \\
+& = & \sqrt{2\pi}\exp(\frac{aD^2}{2}) f(x) \\
+\end{eqnarray*}
+We assumed that $\int_{-\infty}^\infty\exp(-(x-a)^2)dx = \sqrt{2\pi}$ even when $a$ is a differential operator.
+
+So
+\[
+\exp{(\frac{aD^2}{2})}f(x) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^\infty\exp(-\frac{y^2}{2a}) f(x-y) dy 
+\]
+This operation is sometimes called the Weierstrass transform, but better known in the graphics and image processing world as Gaussian blur.
 
 \section{Dirac deltas of $D$ and the Fourier transform}
 We now throw all caution to the wind.
