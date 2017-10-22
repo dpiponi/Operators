@@ -46,13 +46,7 @@
 \epigraph{In memory of Tom Mower who started me on this journey more than three decades ago}
 
 \begin{abstract}
-Some techniques for abusing the operator $D=\frac{d}{dx}$ for both symbolic and numberic integration and differential equation solving.
-Note: work in progress.
-There are errors, some of which I know about.
-Notation is also inconsistent.
-Check back frequently.
-Starts with stuff I originally learnt at high school.
-Eventually gets a bit more advanced.
+Some notes on abusing the operator $D=\frac{d}{dx}$ for both symbolic and numberic integration and differential equation solving.
 \end{abstract}
 
 \section{Warm up}
@@ -778,7 +772,8 @@ $\frac{1}{4320}$
 \end{tabu}
 \end{center}
 
-We can try using these coeffients to integrate an example function.
+We can try using these coefficents to integrate an example function.
+First an approximation computed by another
 \[
 \int_D \cos(2x)\log(2+y^2) dx dy \approx 0.477976.
 \]
@@ -828,8 +823,8 @@ A standard representation of the Dirac delta function is
 \]
 So we have
 \begin{eqnarray*}
-(2\pi\delta(iD-\omega)f)(x) & = & \Big(\int_{-\infty}^\infty\exp(iy(iD-\omega))dyf\Big)(x) \\
-& = & \Big(\int_{-\infty}^\infty\exp(iy(iD-\omega))dyf\Big)(x) \\
+2\pi\delta(iD-\omega)f(x) & = & \int_{-\infty}^\infty\exp(iy(iD-\omega))dyf(x) \\
+& = & \int_{-\infty}^\infty\exp(iy(iD-\omega))dyf(x) \\
 & = & \int_{-\infty}^\infty\exp(-iy\omega)f(x-y)dy \\
 & = & \int_{-\infty}^\infty\exp(i(x-y)\omega)f(y)dy \\
 & = & \exp(ix\omega)\int_{-\infty}^\infty\exp(-iy\omega)f(y)dy \\
@@ -841,7 +836,7 @@ where I'm using the definition
 \]
 Therefore
 \[
-(\delta(iD-\omega)f)(x) = \frac{1}{\sqrt{2\pi}}\exp(ix\omega)\tilde{F}(\omega)
+\delta(iD-\omega)f(x) = \frac{1}{\sqrt{2\pi}}\exp(ix\omega)\tilde{F}(\omega)
 \]
 Notice what it's doing.
 It's projecting the original $f$ to a plane wave scaled by the Fourier transform at $\omega$.
@@ -854,7 +849,7 @@ First on the right hand side:
 This is the usual statement of how to invert the Fourier transform.
 Now on the left hand side:
 \begin{eqnarray*}
-\Big(\int_{-\infty}^\infty\delta(iD-\omega)d\omega f\Big)(x) & = &
+\int_{-\infty}^\infty\delta(iD-\omega)d\omega f(x) & = &
 \frac{1}{\sqrt{2\pi}}\int_{-\infty}^\infty\delta(iD-\omega)\int_{-\infty}^\infty\tilde{F}(\nu)\exp(i\nu x)d\nu d\omega \\
 & = & \frac{1}{\sqrt{2\pi}}\int_{-\infty}^\infty\int_{-\infty}^\infty\tilde{F}(\nu)\delta(iD-\omega)\exp(i\nu x)d\omega d\nu \\
 & = & \frac{1}{\sqrt{2\pi}}\int_{-\infty}^\infty\int_{-\infty}^\infty\tilde{F}(\nu)\delta(i(i\nu)-\omega)\exp(i\nu x)d\omega d\nu \mbox{ (diagonalisation)}\\
@@ -864,6 +859,9 @@ Now on the left hand side:
 & = & f(x) \\
 \end{eqnarray*}
 This illustrates how we're able to work with a Dirac delta of a differential operator much like how you can work with a conventional Dirac delta.
+
+On its own the Dirac delta of $D$ isn't so useful.
+It gets more interesting when you consider $\delta(iD+ax-\omega)$ but that's for another time.
 
 %(Two mistakes I often make: dropping $2\pi$ and minus signs.
 %I may have made both here.
@@ -904,6 +902,10 @@ For example $\exp(xD)$ is an operator that appears in many places.
 However, I have to draw the line somewhere.
 So in these notes I've chosen to stick with functions of just $D$ and leave the larger class of operators to a sequel.
 
+I've left out any mention of fractional powers of $D$.
+Whenever I try to read about this subject I mostly find fractional powers of $D$ being used to solve problems about fractional powers of $D$.
+But there is a large literature on the subject out there.
+
 \section{Final thoughts}
 There are a couple of other uniform approaches to much of what I've said above.
 
@@ -915,7 +917,7 @@ Guess something general enough and solve for the coefficients.
 Another approach, relevant to the numerical methods, is to again assume your problem is about polynomials, and use Lagrange interpolation to fit a polynomial to your data.
 You now integrate or differentiate the interpolating polynomial and relate this back as a linear operation on your original data.
 
-Both of these miss out on the hidden structure given by rational and transcendental functions of $D$.
+Both of these miss out on the hidden structure given by the rational and transcendental functions of $D$ I've written about here.
 
 \bibliographystyle{unsrt}
 \bibliography{operators}
