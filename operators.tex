@@ -46,7 +46,9 @@
 \epigraph{In memory of Tom Mower who started me on this journey more than three decades ago}
 
 \begin{abstract}
-Some notes on abusing the operator $D=\frac{d}{dx}$ for both symbolic and numberic integration and differential equation solving.
+Some unpolished notes on abusing the differential operator $D=\frac{d}{dx}$ for both symbolic and numberic integration and differential equation solving.
+Starts with some methods we were taught at high school(!) for solving differential equations which appear not to be well known among students today.
+Apologies for some inconsistencies in notation.
 \end{abstract}
 
 \section{Warm up}
@@ -324,12 +326,13 @@ Find a solution to
 \end{example}
 No avoiding some messy complex number arithmetic here. We want
 \begin{eqnarray*}
-\frac{1}{D^2+1}e^{-x}\sin(2x)x & = & \Im\frac{1}{D^2+1}e^{(2i-1)x}x \\
-& = & e^{-x}\Im e^{2ix}\frac{1}{(D+2i-1)^2+1}x \\
-& = & e^{-x}\Im e^{2ix}\frac{-1}{2+4i}\frac{1}{1-\frac{2(2i-1)}{2+4i}D}x \\
-& = & e^{-x}\Im e^{2ix}\frac{-1}{2+4i}(x+\frac{2(2i-1)}{2+4i}) \\
-& = & \frac{1}{50}e^{-x}\Im (\cos(2x)+i\sin(2x))(((10i-5)x-(11-2i))) \\
-& = & \frac{1}{50}e^{-x}((2+10x)\cos(2x)-(11+5x)\sin(2x)) \\
+\frac{1}{D^2+1}e^{-x}\sin(2x)x
+& = & \Im \Big[ \frac{1}{D^2+1}e^{(2i-1)x}x \Big] \\
+& = & e^{-x}\Im \Big[ e^{2ix}\frac{1}{(D+2i-1)^2+1}x \Big] \\
+& = & e^{-x}\Im \Big[ e^{2ix}\frac{-1}{2+4i}\frac{1}{1-\frac{2(2i-1)}{2+4i}D}x \Big] \\
+& = & e^{-x}\Im \Big[ e^{2ix}\frac{-1}{2+4i}(x+\frac{2(2i-1)}{2+4i}) \Big] \\
+& = & \frac{1}{50}e^{-x}\Im \Big[ (\cos(2x)+i\sin(2x))\big((10i-5)x-(11-2i)\big) \Big] \\
+& = & \frac{1}{50}e^{-x}\big((2+10x)\cos(2x)-(11+5x)\sin(2x)\big) \\
 \end{eqnarray*}
 
 \begin{example}
