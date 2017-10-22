@@ -109,7 +109,7 @@ So we can rewrite our integral as
   & \exp(2x)\frac{1}{D+2}x^3 \\
 = & \exp(2x)\frac{1}{2}\frac{1}{1+D/2}x^3 \\
 = & \exp(2x)\frac{1}{2}(1-\frac{D}{2}+(\frac{D}{2})^2-(\frac{D}{2})^3+\ldots)x^3 \\
-= & \frac{1}{2}\exp(2x)(x^3-\frac{3}{2}x^2+\frac{3}{2}x-\frac{3}{4}) \\
+%= & \frac{1}{2}\exp(2x)(x^3-\frac{3}{2}x^2+\frac{3}{2}x-\frac{3}{4}) \\
 = & \frac{1}{8}\exp(2x)(4x^3-6x^2+6x-3) \\
 \end{eqnarray}
 We have used the same division and power series operations as above.
@@ -320,8 +320,23 @@ Solution:
 & = & \frac{1}{5}\exp(-x)(1+\frac{8}{5}D)x \\
 & = & \frac{1}{25}\exp(-x)(5x+8) \\
 \end{eqnarray*}
-
 \end{example}
+
+\begin{example}
+Find a solution to
+\[
+\frac{d^2f}{dx^2}+f = x e^{-x}\sin(2x)
+\]
+\end{example}
+No avoiding some messy complex number arithmetic here. We want
+\begin{eqnarray*}
+\frac{1}{D^2+1}e^{-x}\sin(2x)x & = & \Im\frac{1}{D^2+1}e^{(2i-1)x}x \\
+& = & e^{-x}\Im e^{2ix}\frac{1}{(D+2i-1)^2+1}x \\
+& = & e^{-x}\Im e^{2ix}\frac{-1}{2+4i}\frac{1}{1-\frac{2(2i-1)}{2+4i}D}x \\
+& = & e^{-x}\Im e^{2ix}\frac{-1}{2+4i}(x+\frac{2(2i-1)}{2+4i}) \\
+& = & \frac{1}{50}e^{-x}\Im (\cos(2x)+i\sin(2x))(((10i-5)x-(11-2i))) \\
+& = & \frac{1}{50}e^{-x}((2+10x)\cos(2x)-(11+5x)\sin(2x)) \\
+\end{eqnarray*}
 
 \begin{example}
 Find
@@ -343,6 +358,19 @@ So we're left with
 \]
 This is $n!$.
 \end{example}
+
+\begin{example}
+Find a solution to
+\[
+\frac{df}{dx}+f(x) = g(x)
+\]
+\end{example}
+This becomes
+\begin{eqnarray*}
+f(x) & = & \frac{1}{1+D}g(x) \\
+& = & e^{-x}\frac{1}{D}e^x g(x) \\
+\end{eqnarray*}
+
 
 \begin{figure}
 \centering
@@ -713,7 +741,7 @@ It's convenient to start with the disk of radius 2 with the $5\times 5$ grid fro
 \end{tikzpicture}
 \end{figure}
 
-First we compute the intgral
+First we compute the integral
 \begin{eqnarray*}
 U(a,b) & = & \frac{1}{\pi}\int_D \exp(ax+by)dxdy \\
        & = & \frac{1}{\pi}\int_0^{2\pi}\int_0^2 \exp(a\cos\theta+b\cos\theta)rdrd\theta \\
@@ -845,6 +873,12 @@ This illustrates how we're able to work with a Dirac delta of a differential ope
 %
 %\section{The Wigner transformation, the Heisenberg group 'n' all that}
 %Maybe I'll get onto this\dots
+
+\section{A short note on integration and differentiation schemes}
+The technique for both integration and differentiation schemes is to write your differential operator in terms of finite difference operators, expand as a power series, truncate, and only then rewrite using shift operators.
+It's important to first expand in terms of finite differences because high powers of finite differences eventually go to zero when applied to polynomials.
+So we have convergence on vector spaces polynomials.
+Generic linear combinations of powers of shift operators don't have this property.
 
 \section{Summary}
 \begin{center}
